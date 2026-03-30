@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Book Depot</title>
+  <title>Space Tech</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <style>
     body {
       font-family: Arial;
-      margin: 0;
       background: #0f172a;
       color: white;
       text-align: center;
@@ -17,11 +16,6 @@
       background: #020617;
       padding: 20px;
       font-size: 24px;
-      font-weight: bold;
-    }
-
-    .container {
-      padding: 20px;
     }
 
     input, select, button {
@@ -35,12 +29,10 @@
     button {
       background: #22c55e;
       color: white;
-      font-size: 16px;
     }
 
     .result {
-      margin-top: 20px;
-      font-size: 20px;
+      margin-top: 15px;
       color: #38bdf8;
     }
   </style>
@@ -48,49 +40,121 @@
 
 <body>
 
-<header>📚 My Book Depot</header>
+<header>🚀 Space Tech Book Depot</header>
 
-<div class="container">
-  
-  <h2>Student Details</h2>
+<h2>Student Details</h2>
 
-  <input type="text" id="name" placeholder="Enter Name">
-  <input type="text" id="school" placeholder="Enter School Name">
+<input type="text" id="name" placeholder="Name">
+<input type="text" id="token" placeholder="Token Number">
 
-  <select id="class">
-    <option value="">Select Class</option>
-    <option value="500">Nursery - ₹500</option>
-    <option value="800">1st - ₹800</option>
-    <option value="1000">2nd - ₹1000</option>
-    <option value="1200">3rd - ₹1200</option>
-    <option value="1500">4th - ₹1500</option>
-    <option value="1800">5th - ₹1800</option>
-    <option value="2000">6th - ₹2000</option>
-    <option value="2200">7th - ₹2200</option>
-    <option value="2500">8th - ₹2500</option>
-    <option value="2800">9th - ₹2800</option>
-    <option value="3000">10th - ₹3000</option>
-  </select>
+<select id="board">
+  <option value="">Board</option>
+  <option>CBSE</option>
+  <option>SSC</option>
+</select>
 
-  <button onclick="calculate()">Check Fee</button>
+<select id="class" onchange="updateFee()">
+  <option value="">Class</option>
+  <option value="500">Nursery - ₹500</option>
+  <option value="1000">1st - ₹1000</option>
+  <option value="2000">5th - ₹2000</option>
+  <option value="3000">10th - ₹3000</option>
+</select>
 
-  <div class="result" id="result"></div>
+<div id="fee" class="result"></div>
 
-</div>
+<select id="payment">
+  <option value="">Payment</option>
+  <option value="upi">UPI</option>
+  <option value="store">Pay at Store</option>
+  <option value="cash">Cash</option>
+</select>
+
+<button onclick="submitForm()">Proceed</button>
+
+<div id="result" class="result"></div>
+
+<button onclick="downloadReceipt()">Download Receipt</button>
+
+<button onclick="showAdmin()">Admin Panel</button>
+
+<div id="adminData"></div>
 
 <script>
-function calculate() {
-  let name = document.getElementById("name").value;
-  let school = document.getElementById("school").value;
-  let fee = document.getElementById("class").value;
 
-  if(name === "" || school === "" || fee === "") {
-    document.getElementById("result").innerHTML = "⚠️ Please fill all details";
-  } else {
-    document.getElementById("result").innerHTML =
-      "Student: " + name + "<br>School: " + school + "<br>Total Fee: ₹" + fee;
+let currentData = {};
+
+function updateFee() {
+  let fee = document.getElementById("class").value;
+  document.getElementById("fee").innerHTML = "Total: ₹" + fee;
+}
+
+function submitForm() {
+  let name = document.getElementById("name").value;
+  let token = document.getElementById("token").value;
+  let board = document.getElementById("board").value;
+  let fee = document.getElementById("class").value;
+  let payment = document.getElementById("payment").value;
+
+  if(!name || !token || !board || !fee || !payment){
+    alert("Fill all details");
+    return;
+  }
+
+  currentData = {name, token, board, fee, payment};
+
+  // Save locally (Admin)
+  let data = JSON.parse(localStorage.getItem("orders") || "[]");
+  data.push(currentData);
+  localStorage.setItem("orders", JSON.stringify(data));
+
+  document.getElementById("result").innerHTML =
+    "✅ Confirmed<br>Amount: ₹" + fee;
+
+  // UPI Payment
+  if(payment === "upi"){
+    let upiLink = `upi://pay?pa=yourupi@upi&pn=SpaceTech&am=${fee}&cu=INR`;
+    window.location.href = upiLink;
   }
 }
+
+function downloadReceipt() {
+  let text = `
+Receipt
+-------
+Name: ${currentData.name}
+Token: ${currentData.token}
+Board: ${currentData.board}
+Amount: ₹${currentData.fee}
+Payment: ${currentData.payment}
+`;
+
+  let blob = new Blob([text], { type: "text/plain" });
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "receipt.txt";
+  link.click();
+}
+
+function showAdmin() {
+  let password = prompt("Enter Admin Password");
+
+  if(password !== "1234"){
+    alert("Wrong Password");
+    return;
+  }
+
+  let data = JSON.parse(localStorage.getItem("orders") || "[]");
+
+  let output = "<h3>All Orders</h3>";
+
+  data.forEach(d => {
+    output += `Name: ${d.name} | ₹${d.fee}<br>`;
+  });
+
+  document.getElementById("adminData").innerHTML = output;
+}
+
 </script>
 
 </body>
