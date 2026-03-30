@@ -1,38 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Space Tech</title>
+  <title>STL Learning</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       font-family: Arial;
-      background: #0f172a;
-      color: white;
+      margin: 0;
       text-align: center;
+      color: white;
+      background: linear-gradient(135deg, #0f172a, #6d28d9);
     }
 
     header {
-      background: #020617;
       padding: 20px;
-      font-size: 24px;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
     }
 
     input, select, button {
       width: 90%;
-      padding: 10px;
+      padding: 12px;
       margin: 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
+      font-size: 16px;
     }
 
     button {
       background: #22c55e;
       color: white;
+      font-weight: bold;
     }
 
     .result {
-      margin-top: 15px;
+      margin-top: 20px;
+      font-size: 18px;
       color: #38bdf8;
     }
   </style>
@@ -40,119 +48,98 @@
 
 <body>
 
-<header>🚀 Space Tech Book Depot</header>
+<header>🚀 STL Learning</header>
 
-<h2>Student Details</h2>
+<div class="container">
 
 <input type="text" id="name" placeholder="Name">
 <input type="text" id="token" placeholder="Token Number">
 
-<select id="board">
-  <option value="">Board</option>
-  <option>CBSE</option>
-  <option>SSC</option>
+<select id="board" onchange="resetFee()">
+  <option value="">Select Board</option>
+  <option value="cbse">CBSE</option>
+  <option value="ssc">SSC</option>
 </select>
 
 <select id="class" onchange="updateFee()">
-  <option value="">Class</option>
-  <option value="500">Nursery - ₹500</option>
-  <option value="1000">1st - ₹1000</option>
-  <option value="2000">5th - ₹2000</option>
-  <option value="3000">10th - ₹3000</option>
+  <option value="">Select Class</option>
+  <option value="2964">Nursery</option>
+  <option value="3749">LKG</option>
+  <option value="3926">UKG</option>
+  <option value="5560">Grade 1</option>
+  <option value="5631">Grade 2</option>
+  <option value="6282">Grade 3</option>
+  <option value="6527">Grade 4</option>
+  <option value="6567">Grade 5</option>
+  <option value="6475">Grade 6</option>
+  <option value="6825">Grade 7</option>
+  <option value="6990">Grade 8</option>
+  <option value="6725">Grade 9</option>
 </select>
 
 <div id="fee" class="result"></div>
 
 <select id="payment">
-  <option value="">Payment</option>
+  <option value="">Payment Method</option>
   <option value="upi">UPI</option>
   <option value="store">Pay at Store</option>
   <option value="cash">Cash</option>
 </select>
 
-<button onclick="submitForm()">Proceed</button>
+<button onclick="processPayment()">Proceed</button>
 
 <div id="result" class="result"></div>
 
-<button onclick="downloadReceipt()">Download Receipt</button>
-
-<button onclick="showAdmin()">Admin Panel</button>
-
-<div id="adminData"></div>
+</div>
 
 <script>
 
-let currentData = {};
+let currentFee = 0;
 
-function updateFee() {
-  let fee = document.getElementById("class").value;
-  document.getElementById("fee").innerHTML = "Total: ₹" + fee;
+function resetFee(){
+  document.getElementById("fee").innerHTML = "";
 }
 
-function submitForm() {
+function updateFee(){
+  let board = document.getElementById("board").value;
+  let selected = document.getElementById("class");
+
+  if(board === "cbse"){
+    currentFee = selected.value;
+    document.getElementById("fee").innerHTML = "Amount: ₹" + currentFee;
+  } else {
+    currentFee = 0;
+    document.getElementById("fee").innerHTML = "⚠️ SSC prices are different";
+  }
+}
+
+function generateID(){
+  return "STL" + Math.floor(100000 + Math.random() * 900000);
+}
+
+function processPayment(){
   let name = document.getElementById("name").value;
   let token = document.getElementById("token").value;
   let board = document.getElementById("board").value;
-  let fee = document.getElementById("class").value;
   let payment = document.getElementById("payment").value;
 
-  if(!name || !token || !board || !fee || !payment){
-    alert("Fill all details");
+  if(!name || !token || !board || !currentFee || !payment){
+    alert("Please fill all details");
     return;
   }
 
-  currentData = {name, token, board, fee, payment};
+  let paymentID = generateID();
 
-  // Save locally (Admin)
-  let data = JSON.parse(localStorage.getItem("orders") || "[]");
-  data.push(currentData);
-  localStorage.setItem("orders", JSON.stringify(data));
+  if(payment === "upi"){
+    let upi = `upi://pay?9440081394-5@ybl&pn=STL&am=${currentFee}&cu=INR`;
+    window.location.href = upi;
+  }
 
   document.getElementById("result").innerHTML =
-    "✅ Confirmed<br>Amount: ₹" + fee;
-
-  // UPI Payment
-  if(payment === "upi"){
-    let upiLink = `upi://pay?9440081394-5@ybl&pn=SpaceTech&am=${fee}&cu=INR`;
-    window.location.href = upiLink;
-  }
-}
-
-function downloadReceipt() {
-  let text = `
-Receipt
--------
-Name: ${currentData.name}
-Token: ${currentData.token}
-Board: ${currentData.board}
-Amount: ₹${currentData.fee}
-Payment: ${currentData.payment}
-`;
-
-  let blob = new Blob([text], { type: "text/plain" });
-  let link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "receipt.txt";
-  link.click();
-}
-
-function showAdmin() {
-  let password = prompt("Enter Admin Password");
-
-  if(password !== "1234"){
-    alert("Wrong Password");
-    return;
-  }
-
-  let data = JSON.parse(localStorage.getItem("orders") || "[]");
-
-  let output = "<h3>All Orders</h3>";
-
-  data.forEach(d => {
-    output += `Name: ${d.name} | ₹${d.fee}<br>`;
-  });
-
-  document.getElementById("adminData").innerHTML = output;
+    "✅ Payment Successful<br>" +
+    "ID: " + paymentID + "<br>" +
+    "Amount: ₹" + currentFee + "<br><br>" +
+    "🙏 Thank you, visit again!";
 }
 
 </script>
