@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Book Depot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+
+    header {
+      background: #020617;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    input, select, button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      font-size: 16px;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>📚 My Book Depot</header>
+
+<div class="container">
+  
+  <h2>Student Details</h2>
+
+  <input type="text" id="name" placeholder="Enter Name">
+  <input type="text" id="school" placeholder="Enter School Name">
+
+  <select id="class">
+    <option value="">Select Class</option>
+    <option value="500">Nursery - ₹500</option>
+    <option value="800">1st - ₹800</option>
+    <option value="1000">2nd - ₹1000</option>
+    <option value="1200">3rd - ₹1200</option>
+    <option value="1500">4th - ₹1500</option>
+    <option value="1800">5th - ₹1800</option>
+    <option value="2000">6th - ₹2000</option>
+    <option value="2200">7th - ₹2200</option>
+    <option value="2500">8th - ₹2500</option>
+    <option value="2800">9th - ₹2800</option>
+    <option value="3000">10th - ₹3000</option>
+  </select>
+
+  <button onclick="calculate()">Check Fee</button>
+
+  <div class="result" id="result"></div>
+
+</div>
+
+<script>
+function calculate() {
+  let name = document.getElementById("name").value;
+  let school = document.getElementById("school").value;
+  let fee = document.getElementById("class").value;
+
+  if(name === "" || school === "" || fee === "") {
+    document.getElementById("result").innerHTML = "⚠️ Please fill all details";
+  } else {
+    document.getElementById("result").innerHTML =
+      "Student: " + name + "<br>School: " + school + "<br>Total Fee: ₹" + fee;
+  }
+}
+</script>
+
+</body>
+</html>
